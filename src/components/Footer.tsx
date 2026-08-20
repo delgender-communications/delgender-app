@@ -25,7 +25,7 @@ const Footer = ({ onBook }: FooterProps) => {
 
         <div className="social-links">
           <a
-            href="#"
+            href="https://www.linkedin.com/in/delgender-communications-a36321429/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
@@ -33,7 +33,7 @@ const Footer = ({ onBook }: FooterProps) => {
             <FiLinkedin className="social-icon" />
           </a>
           <a
-            href="#"
+            href="https://instagram.com/delgendercommunications"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
@@ -41,7 +41,7 @@ const Footer = ({ onBook }: FooterProps) => {
             <FiInstagram className="social-icon" />
           </a>
           <a
-            href="#"
+            href="https://www.facebook.com/profile.php?id=61593191693003"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
@@ -51,10 +51,10 @@ const Footer = ({ onBook }: FooterProps) => {
         </div>
 
         <a
-          href="mailto:hello@delgendercommunications.com"
+          href="mailto:delgendercommunications@gmail.com"
           className="contact-link"
         >
-          hello@delgendercommunications.com
+          delgendercommunications@gmail.com
         </a>
       </div>
 

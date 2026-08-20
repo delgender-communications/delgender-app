@@ -103,7 +103,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
                 type="text"
                 name="name"
                 required
-                placeholder="Jane Doe"
+                placeholder="Your name"
               />
             </label>
             <ValidationError prefix="Name" field="name" errors={state.errors} />
@@ -125,7 +125,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
                   type="text"
                   name="company"
                   required
-                  placeholder="Acme Inc."
+                  placeholder="Your company name"
                 />
               </label>
             </div>
@@ -138,7 +138,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
                   type="tel"
                   name="phone"
                   required
-                  placeholder="+27 82 000 0000"
+                  placeholder="e.g. +27..."
                 />
               </label>
               <label htmlFor="email">
@@ -148,7 +148,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
                   type="email"
                   name="email"
                   required
-                  placeholder="jane@company.com"
+                  placeholder="Your email address"
                 />
               </label>
             </div>

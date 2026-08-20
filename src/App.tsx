@@ -146,13 +146,13 @@ const App = () => {
             Book a free introductory call and let's talk about where your brand
             is, and where it could be.
           </p>
-          <button
+          {/*<button
             type="button"
             className="btn-primary"
             onClick={openAppointment}
           >
             Book an Appointment
-          </button>
+          </button>*/}
         </section>
       </div>
 

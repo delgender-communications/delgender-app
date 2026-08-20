@@ -141,7 +141,7 @@
 .appt-radio {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-size: 14px;
   font-weight: 400;
   color: var(--muted);
@@ -152,7 +152,8 @@
 .appt-checkbox input,
 .appt-radio input {
   width: auto;
-  margin: 0;
+  margin: 0 6px 0 0;
+  flex-shrink: 0;
   accent-color: var(--accent);
 }
 
@@ -160,13 +161,12 @@
   flex-wrap: wrap;
 }
 
-.appt-inline-input {
-  flex: 1;
-  min-width: 140px;
-  margin-top: 0 !important;
+.appt-checkbox-other .appt-inline-input {
+  flex: 1 1 100%;
+  min-width: 0;
+  margin-left: 8px;
   padding: 6px 10px !important;
 }
-
 .appt-consent {
   margin-top: 20px;
   color: var(--text);
