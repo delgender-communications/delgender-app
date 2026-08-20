@@ -1,122 +1,166 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import AppointmentForm from "./components/AppointmentForm";
+import services from "./data/services";
+import processSteps from "./data/process";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Allows the "Book an Appointment" popup to be opened directly from an
+// external link, e.g. https://your-domain.com/?book=1
+const hasBookParam = () =>
+  typeof window !== "undefined" &&
+  new URLSearchParams(window.location.search).has("book");
+
+const App = () => {
+  const [showAppointment, setShowAppointment] = useState(hasBookParam);
+
+  useEffect(() => {
+    document.title =
+      "Delgender Communications | Identify. Strategize. Elevate.";
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("book")) {
+      params.delete("book");
+      const cleanUrl =
+        window.location.pathname +
+        (params.toString() ? `?${params.toString()}` : "") +
+        window.location.hash;
+      window.history.replaceState({}, "", cleanUrl);
+    }
+  }, []);
+
+  const openAppointment = () => setShowAppointment(true);
+  const closeAppointment = () => setShowAppointment(false);
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+      <div className="app-container" id="top">
+        <Navbar onBook={openAppointment} />
+
+        {/* Hero */}
+        <section className="hero">
+          <span className="section-label">Delgender Communications</span>
+          <h1 className="hero-title">
+            We find the issue.
+            <br />
+            We create the solution.
+            <br />
+            We help you <span className="accent-text">grow</span>.
+          </h1>
+          <p className="hero-subtitle">
+            A strategic communications and brand consultancy helping businesses
+            identify what's holding them back, strategize a clear path forward,
+            and elevate how the world sees them.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+          <div className="hero-actions">
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={openAppointment}
+            >
+              Book an Appointment
+            </button>
+            <a href="#services" className="btn-ghost">
+              View our services
+            </a>
+          </div>
+        </section>
 
-      <div className="ticks"></div>
+        {/* About */}
+        <section className="about">
+          <div className="about-card">
+            <div className="about-col">
+              <h3>Identify</h3>
+              <p>
+                We dig into your brand, your audience, and your market to
+                pinpoint exactly where communication is breaking down.
+              </p>
+            </div>
+            <div className="about-col">
+              <h3>Strategize</h3>
+              <p>
+                We turn that insight into a clear, actionable plan built around
+                your goals, not generic templates.
+              </p>
+            </div>
+            <div className="about-col">
+              <h3>Elevate</h3>
+              <p>
+                We execute with precision and refine as we go, so your brand
+                keeps growing long after launch.
+              </p>
+            </div>
+          </div>
+        </section>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* Services */}
+        <section className="services" id="services">
+          <span className="section-label">What we do</span>
+          <h2 className="section-title">Our Services</h2>
+          <p className="section-subtitle">
+            Every business needs to be seen clearly and heard consistently.
+            Here's how we make that happen.
+          </p>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+          <div className="services-grid">
+            {services.map((service) => {
+              const Icon = service.icon;
+              return (
+                <div className="service-card" key={service.title}>
+                  <div className="service-icon">
+                    <Icon size={22} />
+                  </div>
+                  <h3>{service.title}</h3>
+                  <p>{service.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Process */}
+        <section className="process" id="process">
+          <span className="section-label">How we work</span>
+          <h2 className="section-title">Our Process</h2>
+          <p className="section-subtitle">
+            Three simple stages take you from unclear messaging to a brand
+            people remember.
+          </p>
+
+          <div className="process-grid">
+            {processSteps.map((step) => (
+              <div className="process-step" key={step.number}>
+                <span className="process-number">{step.number}</span>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="cta">
+          <h2 className="section-title">Ready to elevate your brand?</h2>
+          <p className="section-subtitle">
+            Book a free introductory call and let's talk about where your brand
+            is, and where it could be.
+          </p>
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={openAppointment}
+          >
+            Book an Appointment
+          </button>
+        </section>
+      </div>
+
+      <Footer onBook={openAppointment} />
+
+      {showAppointment && <AppointmentForm onClose={closeAppointment} />}
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;

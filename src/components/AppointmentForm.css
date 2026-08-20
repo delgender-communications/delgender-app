@@ -1,0 +1,266 @@
+.appt-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.25s ease-in-out,
+    visibility 0.25s ease-in-out;
+}
+
+.appt-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.appt-popup {
+  background-color: var(--nav-surface-opaque);
+  padding: 32px;
+  border-radius: 18px;
+  border: 1px solid var(--nav-surface-border);
+  box-shadow: var(--shadow-accent);
+  width: 100%;
+  max-width: 460px;
+  max-height: calc(100svh - 40px);
+  overflow-y: auto;
+  transform: scale(0.94) translateY(6px);
+  transition: transform 0.25s ease-in-out;
+  position: relative;
+  text-align: left;
+}
+
+.appt-popup.show {
+  transform: scale(1) translateY(0);
+}
+
+.appt-popup h2 {
+  font-size: 26px;
+  margin: 0 0 8px;
+}
+
+.appt-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.appt-popup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 14px 0 6px;
+}
+
+.appt-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.appt-popup input,
+.appt-popup select,
+.appt-popup textarea {
+  width: 100%;
+  padding: 11px 12px;
+  margin-top: 6px;
+  border: 1px solid var(--border-strong);
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.appt-popup select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239aa4ab' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+}
+
+.appt-popup textarea {
+  height: 90px;
+  resize: vertical;
+}
+
+.appt-popup input::placeholder,
+.appt-popup textarea::placeholder {
+  color: var(--really-muted);
+}
+
+.appt-popup input:focus,
+.appt-popup select:focus,
+.appt-popup textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background-color: var(--card-bg-hover);
+}
+
+.appt-section-heading {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 22px 0 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.appt-popup form > .appt-section-heading:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.appt-fieldset-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 14px 0 8px;
+}
+
+.appt-checkbox-group,
+.appt-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.appt-checkbox,
+.appt-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--muted);
+  margin: 0;
+  cursor: pointer;
+}
+
+.appt-checkbox input,
+.appt-radio input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.appt-checkbox-other {
+  flex-wrap: wrap;
+}
+
+.appt-inline-input {
+  flex: 1;
+  min-width: 140px;
+  margin-top: 0 !important;
+  padding: 6px 10px !important;
+}
+
+.appt-consent {
+  margin-top: 20px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.appt-fine-print {
+  font-size: 12.5px;
+  color: var(--really-muted);
+  text-align: center;
+  margin-top: 12px;
+}
+
+.appt-submit-btn {
+  width: 100%;
+  border-radius: 10px;
+  padding: 13px;
+  margin-top: 20px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #00191b;
+  background-color: var(--accent);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  border: none;
+}
+
+.appt-submit-btn:hover:not(:disabled) {
+  background-color: var(--accent-strong);
+}
+
+.appt-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.appt-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  z-index: 10;
+  display: flex;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.appt-close-btn:hover,
+.appt-close-btn:focus {
+  color: var(--text);
+  outline: none;
+}
+
+.appt-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 30px 10px;
+}
+
+.appt-success {
+  color: var(--accent);
+}
+
+.appt-success p {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.appt-error {
+  color: #ff6b6b;
+  padding: 16px 0 0;
+}
+
+.appt-error p {
+  color: #ff9b9b;
+  font-size: 14px;
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .appt-row {
+    grid-template-columns: 1fr;
+  }
+
+  .appt-popup {
+    padding: 26px 20px;
+  }
+}
