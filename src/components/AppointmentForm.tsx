@@ -8,7 +8,7 @@ import "./AppointmentForm.css";
 import industries from "../data/industries";
 import { createBooking, MeetingType } from "../services/bookingService";
 
-const FORMSPREE_ID = import.meta.env.FORMSPREE_ID || "";
+const FORMSPREE_ID = import.meta.env.VITE_FORMSPREE_ID || "";
 
 const needsOptions = [
   "Business Strategy & Growth",
