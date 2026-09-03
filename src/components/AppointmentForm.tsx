@@ -76,7 +76,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setApiError(null);
     setIsSubmitting(true);
@@ -109,11 +109,13 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
     };
 
     try {
+      const formspreeSubmission = handleFormspreeSubmit(e);
+
       // send data to backend API
       await createBooking(payload);
 
       // send notification to formspree
-      await handleFormspreeSubmit(e);
+      await formspreeSubmission;
     } catch (err) {
       setApiError(
         err instanceof Error ? err.message : "Failed to record booking.",

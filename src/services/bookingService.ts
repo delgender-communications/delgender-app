@@ -59,6 +59,7 @@ export const createBooking = async (
       throw new Error(
         errorText ||
           `Error ${error.response?.status ?? "network"}: Failed to submit booking.`,
+        { cause: error },
       );
     }
 
@@ -74,7 +75,9 @@ export const getBookingById = async (id: number): Promise<BookingDto> => {
     const status = axios.isAxiosError(error)
       ? error.response?.status
       : undefined;
-    throw new Error(`Error ${status ?? "network"}: Booking not found.`);
+    throw new Error(`Error ${status ?? "network"}: Booking not found.`, {
+      cause: error,
+    });
   }
 };
 
@@ -94,6 +97,8 @@ export const getAllBookings = async (
     const status = axios.isAxiosError(error)
       ? error.response?.status
       : undefined;
-    throw new Error(`Error ${status ?? "network"}: Failed to fetch bookings.`);
+    throw new Error(`Error ${status ?? "network"}: Failed to fetch bookings.`, {
+      cause: error,
+    });
   }
 };
