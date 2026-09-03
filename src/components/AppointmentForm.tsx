@@ -1,6 +1,5 @@
 // external
 import { useEffect, useState } from "react";
-import { useForm, ValidationError } from "@formspree/react";
 import { FiX, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 
 // internal
@@ -48,11 +47,13 @@ const mapMeetingType = (val: string): MeetingType => {
 };
 
 const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
-  const [formspreeState, handleFormspreeSubmit] = useForm(FORMSPREE_ID);
+  const [formspreeError, setFormspreeError] = useState<string | null>(null);
   const [show, setShow] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSucceeded, setBookingSucceeded] = useState(false);
+
+  console.log("Formspree ID:", FORMSPREE_ID);
 
   const handleClose = () => {
     setShow(false);
@@ -81,6 +82,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
     e.preventDefault();
 
     setApiError(null);
+    setFormspreeError(null);
     setBookingSucceeded(false);
     setIsSubmitting(true);
 
@@ -113,13 +115,30 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
     };
 
     try {
-      // 1. save the booking to your backend
+      // save booking to your backend
       await createBooking(payload);
 
-      // 2. submit the ORIGINAL form event to Formspree
-      await handleFormspreeSubmit(e);
+      // submit the same form data directly to formspree
+      const formspreeResponse = await fetch(
+        `https://formspree.io/f/${FORMSPREE_ID}`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            Accept: "application/json",
+          },
+        },
+      );
 
-      // 3. only show success once both submissions have completed
+      const formspreeResult = await formspreeResponse.json();
+
+      if (!formspreeResponse.ok) {
+        throw new Error(
+          formspreeResult?.errors?.[0]?.message ||
+            "Formspree failed to send the notification.",
+        );
+      }
+
       setBookingSucceeded(true);
     } catch (err) {
       console.error("Booking/Formspree submission failed:", err);
@@ -227,11 +246,6 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
                 />
               </label>
             </div>
-            <ValidationError
-              prefix="Email"
-              field="email"
-              errors={formspreeState.errors}
-            />
 
             <p className="appt-section-heading">About Your Business</p>
 
@@ -354,12 +368,10 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
 
             <button
               type="submit"
-              disabled={isSubmitting || formspreeState.submitting}
+              disabled={isSubmitting}
               className="appt-submit-btn"
             >
-              {isSubmitting || formspreeState.submitting
-                ? "Sending..."
-                : "Book My Consultation"}
+              {isSubmitting ? "Sending..." : "Book My Consultation"}
             </button>
             <p className="appt-fine-print">
               We will confirm your appointment within 24 hours via email/SMS.
@@ -367,7 +379,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
           </form>
         )}
 
-        {(apiError || formspreeState.errors) && !bookingSucceeded && (
+        {(apiError || formspreeError) && !bookingSucceeded && (
           <div className="appt-message appt-error">
             <FiAlertCircle size={22} />
             <p>
