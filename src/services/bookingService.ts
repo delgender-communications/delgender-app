@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.API_BASE_URL || "https://localhost:7123";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7123";
 
 export const MeetingType = {
   InPerson: 0,
@@ -40,7 +40,7 @@ export interface PagedResultDto<T> {
 export const createBooking = async (
   dto: CreateBookingDto,
 ): Promise<BookingDto> => {
-  const response = await fetch(`${API_BASE_URL}/api/bookings/create`, {
+  const response = await fetch(`${BASE_URL}/api/bookings/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export const createBooking = async (
 };
 
 export const getBookingById = async (id: number): Promise<BookingDto> => {
-  const response = await fetch(`${API_BASE_URL}/api/bookings/${id}`);
+  const response = await fetch(`${BASE_URL}/api/bookings/${id}`);
 
   if (!response.ok) {
     throw new Error(`Error ${response.status}: Booking not found.`);
@@ -73,7 +73,7 @@ export const getAllBookings = async (
   pageSize = 10,
 ): Promise<PagedResultDto<BookingDto>> => {
   const response = await fetch(
-    `${API_BASE_URL}/api/bookings?page=${page}&pageSize=${pageSize}`,
+    `${BASE_URL}/api/bookings?page=${page}&pageSize=${pageSize}`,
   );
 
   if (!response.ok) {
