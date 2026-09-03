@@ -1,4 +1,13 @@
+import axios from "axios";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7123";
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 export const MeetingType = {
   InPerson: 0,
@@ -40,45 +49,51 @@ export interface PagedResultDto<T> {
 export const createBooking = async (
   dto: CreateBookingDto,
 ): Promise<BookingDto> => {
-  const response = await fetch(`${BASE_URL}/api/bookings/create`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(dto),
-  });
+  try {
+    const response = await api.post<BookingDto>("/api/bookings/create", dto);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorText =
+        typeof error.response?.data === "string" ? error.response.data : "";
+      throw new Error(
+        errorText ||
+          `Error ${error.response?.status ?? "network"}: Failed to submit booking.`,
+      );
+    }
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      errorText || `Error ${response.status}: Failed to submit booking.`,
-    );
+    throw error;
   }
-
-  return response.json();
 };
 
 export const getBookingById = async (id: number): Promise<BookingDto> => {
-  const response = await fetch(`${BASE_URL}/api/bookings/${id}`);
-
-  if (!response.ok) {
-    throw new Error(`Error ${response.status}: Booking not found.`);
+  try {
+    const response = await api.get<BookingDto>(`/api/bookings/${id}`);
+    return response.data;
+  } catch (error) {
+    const status = axios.isAxiosError(error)
+      ? error.response?.status
+      : undefined;
+    throw new Error(`Error ${status ?? "network"}: Booking not found.`);
   }
-
-  return response.json();
 };
 
 export const getAllBookings = async (
   page = 1,
   pageSize = 10,
 ): Promise<PagedResultDto<BookingDto>> => {
-  const response = await fetch(
-    `${BASE_URL}/api/bookings?page=${page}&pageSize=${pageSize}`,
-  );
-
-  if (!response.ok) {
-    throw new Error(`Error ${response.status}: Failed to fetch bookings.`);
+  try {
+    const response = await api.get<PagedResultDto<BookingDto>>(
+      "/api/bookings",
+      {
+        params: { page, pageSize },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    const status = axios.isAxiosError(error)
+      ? error.response?.status
+      : undefined;
+    throw new Error(`Error ${status ?? "network"}: Failed to fetch bookings.`);
   }
-
-  return response.json();
 };
