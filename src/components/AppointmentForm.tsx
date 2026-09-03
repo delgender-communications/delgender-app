@@ -52,6 +52,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
   const [show, setShow] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingSucceeded, setBookingSucceeded] = useState(false);
 
   const handleClose = () => {
     setShow(false);
@@ -78,7 +79,9 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     setApiError(null);
+    setBookingSucceeded(false);
     setIsSubmitting(true);
 
     const form = e.currentTarget;
@@ -86,7 +89,8 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
 
     const selectedNeeds = formData.getAll("needs") as string[];
     const needsOther = formData.get("needsOther") as string;
-    if (needsOther && needsOther.trim() !== "") {
+
+    if (needsOther?.trim()) {
       selectedNeeds.push(`Other: ${needsOther.trim()}`);
     }
 
@@ -103,20 +107,27 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
       problemDescription: (formData.get("challenge") as string) || "",
       sessionGoal: (formData.get("outcome") as string) || "",
       meeting: mapMeetingType(meetingRaw),
-      date: formData.get("date") as string,
-      time: timeRaw.length === 5 ? `${timeRaw}:00` : timeRaw,
+      date: (formData.get("date") as string) || "",
+      time: timeRaw?.length === 5 ? `${timeRaw}:00` : timeRaw || "",
       contactPermission: formData.get("consent") === "on",
     };
 
     try {
-      // send data to backend API
+      // 1. save the booking to your backend
       await createBooking(payload);
 
-      // send notification to formspree
-      await handleFormspreeSubmit(formData);
+      // 2. submit the ORIGINAL form event to Formspree
+      await handleFormspreeSubmit(e);
+
+      // 3. only show success once both submissions have completed
+      setBookingSucceeded(true);
     } catch (err) {
+      console.error("Booking/Formspree submission failed:", err);
+
       setApiError(
-        err instanceof Error ? err.message : "Failed to record booking.",
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while submitting your booking.",
       );
     } finally {
       setIsSubmitting(false);
@@ -145,14 +156,12 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
         >
           <FiX size={22} />
         </button>
-
         <span className="section-label">Get started</span>
         <h2>Book a Consultation</h2>
         <p className="appt-subtitle">
           Book a consultation to discuss how we can help your business grow.
         </p>
-
-        {formspreeState.succeeded ? (
+        {bookingSucceeded ? (
           <div className="appt-message appt-success">
             <FiCheckCircle size={32} />
             <p>
@@ -358,10 +367,13 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
           </form>
         )}
 
-        {(apiError || (formspreeState.errors && !formspreeState.succeeded)) && (
+        {(apiError || formspreeState.errors) && !bookingSucceeded && (
           <div className="appt-message appt-error">
             <FiAlertCircle size={22} />
-            <p>{apiError || "Something went wrong. Please try again."}</p>
+            <p>
+              {apiError ||
+                "Something went wrong while sending your booking. Please try again."}
+            </p>
           </div>
         )}
       </div>
