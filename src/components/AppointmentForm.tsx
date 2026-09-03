@@ -302,10 +302,10 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
                 <input
                   type="radio"
                   name="meetingType"
-                  value="Online Video Call"
+                  value="Online Meeting"
                   required
                 />
-                Online Video Call
+                Online Meeting
               </label>
               <label className="appt-radio">
                 <input
