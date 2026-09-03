@@ -53,8 +53,6 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSucceeded, setBookingSucceeded] = useState(false);
 
-  console.log("Formspree ID:", FORMSPREE_ID);
-
   const handleClose = () => {
     setShow(false);
     setTimeout(onClose, 250);
@@ -115,7 +113,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
     };
 
     try {
-      // save booking to your backend
+      // send booking data to the backend API
       await createBooking(payload);
 
       // submit the same form data directly to formspree
