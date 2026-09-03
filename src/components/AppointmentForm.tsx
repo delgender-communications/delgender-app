@@ -109,13 +109,11 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
     };
 
     try {
-      const formspreeSubmission = handleFormspreeSubmit(e);
-
       // send data to backend API
       await createBooking(payload);
 
       // send notification to formspree
-      await formspreeSubmission;
+      await handleFormspreeSubmit(formData);
     } catch (err) {
       setApiError(
         err instanceof Error ? err.message : "Failed to record booking.",
