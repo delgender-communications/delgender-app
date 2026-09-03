@@ -1,4 +1,7 @@
+// external
 import { useEffect, useState } from "react";
+
+// internal
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
