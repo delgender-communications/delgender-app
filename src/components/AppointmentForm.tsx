@@ -1,8 +1,12 @@
+// external
 import { useEffect, useState } from "react";
-import "./AppointmentForm.css";
 import { useForm, ValidationError } from "@formspree/react";
 import { FiX, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
+
+// internal
+import "./AppointmentForm.css";
 import industries from "../data/industries";
+import { createBooking, MeetingType } from "../services/bookingService";
 
 const FORMSPREE_ID = import.meta.env.VITE_FORMSPREE_ID || "";
 
@@ -31,9 +35,23 @@ type AppointmentFormProps = {
   onClose: () => void;
 };
 
+const mapMeetingType = (val: string): MeetingType => {
+  switch (val) {
+    case "Online Meeting":
+      return MeetingType.OnlineMeeting;
+    case "Phone Call":
+      return MeetingType.PhoneCall;
+    case "In-person":
+    default:
+      return MeetingType.InPerson;
+  }
+};
+
 const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
-  const [state, handleSubmit] = useForm(FORMSPREE_ID);
+  const [formspreeState, handleFormspreeSubmit] = useForm(FORMSPREE_ID);
   const [show, setShow] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClose = () => {
     setShow(false);
@@ -57,6 +75,53 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setApiError(null);
+    setIsSubmitting(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const selectedNeeds = formData.getAll("needs") as string[];
+    const needsOther = formData.get("needsOther") as string;
+    if (needsOther && needsOther.trim() !== "") {
+      selectedNeeds.push(`Other: ${needsOther.trim()}`);
+    }
+
+    const meetingRaw = formData.get("meetingType") as string;
+    const timeRaw = formData.get("time") as string;
+
+    const payload = {
+      fullName: (formData.get("name") as string) || "",
+      jobTitle: (formData.get("jobTitle") as string) || undefined,
+      companyName: (formData.get("company") as string) || "",
+      email: (formData.get("email") as string) || "",
+      industry: (formData.get("industry") as string) || "",
+      helpWith: selectedNeeds.join(", ") || "General Inquiry",
+      problemDescription: (formData.get("challenge") as string) || "",
+      sessionGoal: (formData.get("outcome") as string) || "",
+      meeting: mapMeetingType(meetingRaw),
+      date: formData.get("date") as string,
+      time: timeRaw.length === 5 ? `${timeRaw}:00` : timeRaw,
+      contactPermission: formData.get("consent") === "on",
+    };
+
+    try {
+      // send data to backend API
+      await createBooking(payload);
+
+      // send notification to formspree
+      await handleFormspreeSubmit(e);
+    } catch (err) {
+      setApiError(
+        err instanceof Error ? err.message : "Failed to record booking.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div
@@ -87,10 +152,12 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
           Book a consultation to discuss how we can help your business grow.
         </p>
 
-        {state.succeeded ? (
+        {formspreeState.succeeded ? (
           <div className="appt-message appt-success">
             <FiCheckCircle size={32} />
-            <p>Your request has been sent. We'll be in touch shortly.</p>
+            <p>
+              Your request has been sent. Check your email for confirmation!
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
@@ -106,7 +173,6 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
                 placeholder="Your name"
               />
             </label>
-            <ValidationError prefix="Name" field="name" errors={state.errors} />
 
             <div className="appt-row">
               <label htmlFor="jobTitle">
@@ -155,19 +221,21 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
             <ValidationError
               prefix="Email"
               field="email"
-              errors={state.errors}
+              errors={formspreeState.errors}
             />
 
             <p className="appt-section-heading">About Your Business</p>
 
             <label htmlFor="industry">
               Industry
-              <select id="industry" name="industry" defaultValue="">
+              <select id="industry" name="industry" defaultValue="" required>
                 <option value="" disabled>
                   Select an industry
                 </option>
                 {industries.map((industry) => (
-                  <option key={industry}>{industry}</option>
+                  <option key={industry} value={industry}>
+                    {industry}
+                  </option>
                 ))}
               </select>
             </label>
@@ -212,6 +280,7 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
               <textarea
                 id="outcome"
                 name="outcome"
+                required
                 placeholder="By the end, I would like to..."
               />
             </label>
@@ -261,7 +330,9 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
                     Select a time
                   </option>
                   {timeSlots.map((slot) => (
-                    <option key={slot}>{slot}</option>
+                    <option key={slot} value={slot}>
+                      {slot}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -274,10 +345,12 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
 
             <button
               type="submit"
-              disabled={state.submitting}
+              disabled={isSubmitting || formspreeState.submitting}
               className="appt-submit-btn"
             >
-              {state.submitting ? "Sending..." : "Book My Consultation"}
+              {isSubmitting || formspreeState.submitting
+                ? "Sending..."
+                : "Book My Consultation"}
             </button>
             <p className="appt-fine-print">
               We will confirm your appointment within 24 hours via email/SMS.
@@ -285,10 +358,10 @@ const AppointmentForm = ({ onClose }: AppointmentFormProps) => {
           </form>
         )}
 
-        {!state.succeeded && state.errors && (
+        {(apiError || (formspreeState.errors && !formspreeState.succeeded)) && (
           <div className="appt-message appt-error">
             <FiAlertCircle size={22} />
-            <p>Something went wrong. Please try again.</p>
+            <p>{apiError || "Something went wrong. Please try again."}</p>
           </div>
         )}
       </div>
