@@ -9,8 +9,9 @@ import AppointmentForm from "./components/AppointmentForm";
 import services from "./data/services";
 import processSteps from "./data/process";
 
-// Allows the "Book an Appointment" popup to be opened directly from an
-// external link, e.g. https://your-domain.com/?book=1
+/** allows the "book an appointment" popup to be opened directly from an
+ external link, e.g. https://your-domain.com/?book=1
+ **/
 const hasBookParam = () =>
   typeof window !== "undefined" &&
   new URLSearchParams(window.location.search).has("book");
@@ -97,7 +98,7 @@ const App = () => {
           </div>
         </section>
 
-        {/* Services */}
+        {/* services */}
         <section className="services" id="services">
           <span className="section-label">What we do</span>
           <h2 className="section-title">Our Services</h2>
@@ -122,7 +123,7 @@ const App = () => {
           </div>
         </section>
 
-        {/* Process */}
+        {/* process */}
         <section className="process" id="process">
           <span className="section-label">How we work</span>
           <h2 className="section-title">Our Process</h2>
@@ -142,7 +143,7 @@ const App = () => {
           </div>
         </section>
 
-        {/* CTA */}
+        {/* cta */}
         <section className="cta">
           <h2 className="section-title">Ready to elevate your brand?</h2>
           <p className="section-subtitle">
